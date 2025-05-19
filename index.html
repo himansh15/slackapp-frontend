@@ -17,10 +17,9 @@
   <button id="sendBtn">Send</button>
 
   <script>
-    // ==== Replace with your actual Render backend URL ====
-    const BACKEND_URL = 'https://your-backend-service.onrender.com';
-    // ====================================================
 
+    const BACKEND_URL = 'https://slackapp-backend.onrender.com';
+   
     // Fetch channel list
     fetch(`${BACKEND_URL}/api/channels`)
       .then(r => r.json())
