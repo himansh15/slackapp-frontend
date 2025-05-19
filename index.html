@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Send a Message to Slack</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    select, input[type="text"] { padding: 6px; }
+    button { padding: 6px 12px; }
+  </style>
+</head>
+<body>
+  <h1>Send a Message to Slack</h1>
+  <label for="channels">Choose Channel: </label>
+  <select id="channels"><option>Loading...</option></select>
+  <br><br>
+  <input type="text" id="message" placeholder="Enter your message" />
+  <button id="sendBtn">Send</button>
+
+  <script>
+    // ==== Replace with your actual Render backend URL ====
+    const BACKEND_URL = 'https://your-backend-service.onrender.com';
+    // ====================================================
+
+    // Fetch channel list
+    fetch(`${BACKEND_URL}/api/channels`)
+      .then(r => r.json())
+      .then(data => {
+        const select = document.getElementById('channels');
+        select.innerHTML = '';
+        data.channels.forEach(c => {
+          select.innerHTML += `<option value="${c.id}">${c.name}</option>`;
+        });
+      })
+      .catch(() => {
+        document.getElementById('channels').innerHTML = "<option>Could not load channels</option>";
+      });
+
+    // Send message
+    document.getElementById('sendBtn').onclick = function() {
+      const channel = document.getElementById('channels').value;
+      const message = document.getElementById('message').value.trim();
+
+      if (!channel || !message) {
+        alert("Channel and message are required!");
+        return;
+      }
+
+      fetch(`${BACKEND_URL}/api/sendMessage`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({channel, message}),
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.ok) {
+          alert('Message sent!');
+          document.getElementById('message').value = '';
+        } else {
+          alert('Error: ' + (data.error || 'Unknown'));
+        }
+      })
+      .catch(() => {
+        alert('Error: Unable to contact backend server.');
+      });
+    };
+  </script>
+</body>
+</html>
